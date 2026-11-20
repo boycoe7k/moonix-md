@@ -133,7 +133,14 @@ function getSlot(value) {
 }
 
 function hasCredentials(slot) {
-    return fs.existsSync(path.join(sessionDir(slot), "creds.json"));
+    // Only a fully paired session counts. A half-finished pairing leaves a
+    // creds.json with registered=false; reloading it makes WhatsApp answer 401.
+    try {
+        const creds = JSON.parse(fs.readFileSync(path.join(sessionDir(slot), "creds.json"), "utf8"));
+        return creds.registered === true;
+    } catch {
+        return false;
+    }
 }
 
 function ensureSessionDir(slot) {
@@ -252,6 +259,7 @@ app.set("trust proxy", 1);
 app.use(express.json({ limit: "1mb" }));
 
 app.use("/games", express.static(path.join(__dirname, "public", "games")));
+app.get("/moonix.jpg", (req, res) => res.sendFile(path.join(__dirname, "public", "moonix.jpg")));
 app.get("/", (req, res) => res.type("html").send(PAIRING_HTML));
 
 app.get("/health", (req, res) => {
@@ -434,7 +442,9 @@ async function createSocket(state, pairingRequested = false) {
     sock.ev.on("creds.update", saveCreds);
 
     sock.ev.on("connection.update", async update => {
-        await handleConnectionUpdate(state, update);
+        // Events from a replaced/old socket must not touch the current one.
+        if (state.sock !== sock) return;
+        await handleConnectionUpdate(state, update, sock);
     });
 
     sock.ev.on("group-participants.update", async update => {
@@ -460,9 +470,8 @@ async function createSocket(state, pairingRequested = false) {
     return sock;
 }
 
-async function handleConnectionUpdate(state, update) {
+async function handleConnectionUpdate(state, update, sock) {
     const { connection, lastDisconnect, qr } = update;
-    const sock = state.sock;
 
     if (connection) setSessionStatus(state, { connection });
 
@@ -497,6 +506,17 @@ async function handleConnectionUpdate(state, update) {
 
     state.sock = null;
     state.pairingInProgress = false;
+
+    // Not paired yet: reconnecting would create a new registration and
+    // invalidate the pairing code on the user's phone (WhatsApp then says
+    // "Couldn't link device"). Stop and let the user request a fresh code.
+    // restartRequired (515) is the normal step right after a successful link.
+    const registered = sock?.authState?.creds?.registered === true;
+    if (!registered && statusCode !== DisconnectReason.restartRequired && !state.stopping) {
+        removeSessionFiles(state.slot);
+        setSessionStatus(state, { connection: "idle", pairingCode: null, qrDataUrl: null });
+        return;
+    }
 
     if (state.stopping) {
         setSessionStatus(state, { connection: "idle", pairingCode: null, qrDataUrl: null });

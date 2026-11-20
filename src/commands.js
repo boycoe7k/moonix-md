@@ -13,7 +13,7 @@ const PREFIX = process.env.PREFIX || ".";
 const BOT_NAME = "Moonix MD";
 const AUTHOR = "Boycoe-dev";
 const { allowCommand } = require("./antiban");
-const MENU_IMAGE = "https://i.ibb.co/xtLwMf12/file-00000000561c824699096bbdc5566486.png";
+const MENU_IMAGE_PATH = require("path").join(__dirname, "..", "public", "moonix.jpg");
 const OWNER = (process.env.OWNER_NUMBER || "").replace(/\D/g, "");
 const KICKALL_DELAY_MS = parseInt(process.env.KICKALL_DELAY_MS || "4000", 10);
 
@@ -778,7 +778,7 @@ async function handleCommand(sock, msg, { startTime, settings }) {
       case "help": {
         const menu = buildMenu(msg.pushName || "User", getRuntime(startTime));
         try {
-          const buf = await urlToBuffer(MENU_IMAGE);
+          const buf = require("fs").readFileSync(MENU_IMAGE_PATH);
           await sock.sendMessage(jid, { image: buf, caption: menu }, { quoted: msg });
         } catch { await reply(sock, msg, menu); }
         break;

@@ -2,20 +2,114 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Moonix Pairing</title>
+<title>Moonix MD · Pair your WhatsApp</title>
 <style>
-:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#12254a;background:#f5f8ff}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;justify-content:center;padding:28px 16px;background:linear-gradient(160deg,#f5f8ff,#eef4ff)}.wrap{width:min(900px,100%)}.hero{background:linear-gradient(135deg,#146ef5,#5b8df8);color:white;border-radius:28px;padding:28px;box-shadow:0 18px 45px #146ef52b}h1{margin:0 0 6px;font-size:32px}.sub{opacity:.9}.panel{margin-top:18px;background:white;border-radius:24px;padding:20px;box-shadow:0 12px 35px #12254a12}label{display:block;font-weight:700;margin-bottom:8px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:650px){.row{grid-template-columns:1fr}}input,select,button{width:100%;border:1px solid #dce5f5;border-radius:14px;padding:13px 14px;font-size:15px}button{border:0;background:#146ef5;color:white;font-weight:800;cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}@media(max-width:650px){.slots{grid-template-columns:1fr}}.slot{border:1px solid #e0e8f7;border-radius:18px;padding:15px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#a9b5c8;margin-right:6px}.open .dot{background:#18c77a}.pairing .dot{background:#f5a623}.code{font:800 22px ui-monospace,monospace;letter-spacing:2px;margin-top:8px}.qr{max-width:190px;width:100%;display:block;margin:12px auto;border-radius:12px}.muted{color:#71819e;font-size:13px}.result{margin-top:14px;padding:14px;border-radius:14px;background:#f5f8ff;display:none}.error{color:#c62828}.ok{color:#167b49}.footer{margin-top:14px;text-align:center;color:#7b8ba7;font-size:12px}
+:root{--bg:#070914;--card:#0f1328cc;--line:#ffffff1a;--g:#7dffb2;--p:#ff6fb5;--t:#eef1ff;--m:#9aa3c7}
+*{box-sizing:border-box}html,body{margin:0}
+body{min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--t);background:var(--bg);overflow-x:hidden;display:flex;justify-content:center;padding:28px 16px 48px}
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden}
+.bg i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.45;animation:float 14s ease-in-out infinite}
+.bg i:nth-child(1){width:420px;height:420px;background:#ff6fb5;top:-120px;left:-100px}
+.bg i:nth-child(2){width:380px;height:380px;background:#7dffb2;bottom:-140px;right:-80px;animation-delay:-5s}
+.bg i:nth-child(3){width:300px;height:300px;background:#6a5cff;top:40%;left:55%;animation-delay:-9s}
+@keyframes float{50%{transform:translate(40px,-50px) scale(1.12)}}
+.stars{position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 20% 30%,#fff9,transparent),radial-gradient(1px 1px at 70% 20%,#fff8,transparent),radial-gradient(1.5px 1.5px at 40% 80%,#fff7,transparent),radial-gradient(1px 1px at 85% 65%,#fff9,transparent),radial-gradient(1px 1px at 10% 70%,#fff7,transparent);animation:tw 4s ease-in-out infinite alternate}
+@keyframes tw{to{opacity:.35}}
+.wrap{position:relative;z-index:1;width:min(560px,100%)}
+.hero{text-align:center;animation:rise .7s both}
+.logo{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(135deg,var(--p),var(--g)) border-box;box-shadow:0 0 40px #ff6fb555;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 60px #7dffb25a;transform:scale(1.04)}}
+h1{margin:14px 0 4px;font-size:34px;letter-spacing:-.5px;background:linear-gradient(90deg,var(--p),var(--g));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--m);font-size:14px}
+.card{margin-top:20px;background:var(--card);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:24px;padding:22px;animation:rise .7s both}
+.card:nth-of-type(2){animation-delay:.1s}.card:nth-of-type(3){animation-delay:.2s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}}
+h2{margin:0 0 4px;font-size:18px}.muted{color:var(--m);font-size:13px;line-height:1.5}
+label{display:block;font-size:12px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 6px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seg button{padding:11px;border-radius:12px;border:1px solid var(--line);background:#ffffff08;color:var(--t);font-weight:700;cursor:pointer;transition:.2s}
+.seg button.on{background:linear-gradient(135deg,#ff6fb540,#7dffb240);border-color:#7dffb280}
+.seg button:hover{transform:translateY(-2px)}
+input{width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:#ffffff0a;color:var(--t);font-size:16px;outline:none;transition:.2s}
+input:focus{border-color:var(--g);box-shadow:0 0 0 3px #7dffb222}
+.go{width:100%;margin-top:18px;padding:15px;border:0;border-radius:14px;font-size:16px;font-weight:800;color:#07101a;cursor:pointer;background:linear-gradient(90deg,var(--p),var(--g));background-size:200% 100%;transition:.3s;position:relative;overflow:hidden}
+.go:hover{background-position:100% 0;transform:translateY(-2px);box-shadow:0 10px 30px #ff6fb533}
+.go:disabled{opacity:.6;cursor:wait;transform:none}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #07101a55;border-top-color:#07101a;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+#res{display:none;margin-top:18px;text-align:center}
+.codebox{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0}
+.ch{width:40px;height:52px;border-radius:12px;background:#ffffff10;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font:800 24px ui-monospace,monospace;animation:pop .4s both}
+.dash{font-size:24px;color:var(--m);animation:pop .4s both}
+@keyframes pop{from{opacity:0;transform:scale(.4) translateY(10px)}}
+.copy{padding:11px 22px;border-radius:12px;border:1px solid var(--g);background:transparent;color:var(--g);font-weight:700;cursor:pointer;transition:.2s}
+.copy:hover{background:#7dffb21a}.copy.done{background:var(--g);color:#07101a}
+.bar{height:5px;border-radius:5px;background:#ffffff14;margin:14px auto 6px;overflow:hidden;max-width:300px}
+.bar b{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--g));width:100%;transition:width 1s linear}
+.err{color:#ff8a8a;font-size:14px}
+ol{margin:12px 0 0;padding-left:20px;color:var(--m);font-size:13px;line-height:1.8;text-align:left}ol b{color:var(--t)}
+.slots{display:grid;gap:10px;margin-top:12px}
+.slot{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-radius:14px;border:1px solid var(--line);background:#ffffff06}
+.pill{font-size:12px;font-weight:700;padding:5px 11px;border-radius:99px;background:#ffffff12;color:var(--m)}
+.pill.open{background:#7dffb226;color:var(--g)}.pill.pairing{background:#ffd16626;color:#ffd166;animation:pulse2 1.5s infinite}
+@keyframes pulse2{50%{opacity:.5}}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,80px);background:#000c;border:1px solid var(--line);padding:10px 18px;border-radius:99px;font-size:14px;transition:.3s;z-index:9}
+.toast.show{transform:translate(-50%,0)}
+.foot{text-align:center;margin-top:22px;color:var(--m);font-size:12px}
+.confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:8;animation:fall 2.4s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.8}}
 </style>
 </head>
-<body><main class="wrap">
-<section class="hero"><h1>🤖 Moonix MD</h1><div class="sub">Multi-device WhatsApp pairing</div></section>
-<section class="panel"><h2>Pair a device</h2><p class="muted">Choose an empty slot, enter the WhatsApp number with country code, then generate a pairing code.</p><div class="row"><div><label>Session slot</label><select id="slot"><option value="1">Session 1</option><option value="2">Session 2</option><option value="3">Session 3</option></select></div><div><label>Phone number</label><input id="phone" inputmode="numeric" placeholder="263781234567"></div></div><button id="pair" style="margin-top:12px">Generate Pairing Code</button><div id="result" class="result"></div></section>
-<section class="panel"><h2>Sessions</h2><div id="slots" class="slots"></div></section><div class="footer">Moonix MD • 3 sessions per deployment</div></main>
+<body>
+<div class="bg"><i></i><i></i><i></i><div class="stars"></div></div>
+<main class="wrap">
+ <section class="hero"><img class="logo" src="/moonix.jpg" alt="Moonix"><h1>Moonix MD</h1><div class="sub">Link your WhatsApp in under a minute</div></section>
+
+ <section class="card">
+  <h2>Pair a device</h2>
+  <div class="muted">Pick a slot, enter your number with country code, and get your code.</div>
+  <label>Session slot</label>
+  <div class="seg" id="seg"><button class="on" data-s="1">Slot 1</button><button data-s="2">Slot 2</button><button data-s="3">Slot 3</button></div>
+  <label>WhatsApp number</label>
+  <input id="phone" inputmode="numeric" autocomplete="tel" placeholder="e.g. 2348012345678 (no + or spaces)">
+  <button class="go" id="go">Generate pairing code</button>
+  <div id="res"></div>
+ </section>
+
+ <section class="card"><h2>Sessions</h2><div class="slots" id="slots"></div></section>
+ <div class="foot">Moonix MD · by Moonix Tech</div>
+</main>
+<div class="toast" id="toast"></div>
 <script>
-const slotsEl=document.getElementById('slots');const result=document.getElementById('result');const btn=document.getElementById('pair');
-function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function render(data){slotsEl.innerHTML='';data.sessions.forEach(s=>{const card=document.createElement('div');card.className='slot '+(s.connection==='open'?'open':s.pairingCode?'pairing':'');let html='<b>Session '+esc(s.slot)+'</b><div class="muted"><span class="dot"></span>'+esc(s.connection)+'</div>';if(s.botId)html+='<div class="muted">'+esc(s.botId)+'</div>';if(s.pairingCode)html+='<div class="code">'+esc(s.pairingCode)+'</div>';if(s.qrDataUrl)html+='<img class="qr" src="'+s.qrDataUrl+'" alt="QR code">';card.innerHTML=html;slotsEl.appendChild(card);});}
-async function refresh(){try{const r=await fetch('/api/sessions');const d=await r.json();if(d.success)render(d);}catch{}}
-btn.onclick=async()=>{btn.disabled=true;result.style.display='block';result.className='result';result.textContent='Generating pairing code...';try{const r=await fetch('/api/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:Number(document.getElementById('slot').value),phone:document.getElementById('phone').value})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Pairing failed');result.className='result ok';result.innerHTML='<b>Pairing code:</b><div class="code">'+esc(d.code)+'</div><div class="muted">WhatsApp → Linked devices → Link a device → Link with phone number</div>';await refresh();}catch(e){result.className='result error';result.textContent=e.message;}finally{btn.disabled=false;}};
+const $=id=>document.getElementById(id);let slot=1,timer=null,lastOpen={},first=true;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#seg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');slot=+b.dataset.s});
+function confetti(){const c=['#ff6fb5','#7dffb2','#6a5cff','#ffd166'];for(let i=0;i<60;i++){const e=document.createElement('i');e.className='confetti';e.style.left=Math.random()*100+'vw';e.style.background=c[i%4];e.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(e);setTimeout(()=>e.remove(),3200)}}
+function showCode(code){
+ clearInterval(timer);const r=$('res');r.style.display='block';
+ const chars=[...code.replace('-','')];
+ let h='<div class="muted">Your pairing code</div><div class="codebox">';
+ chars.forEach((c,i)=>{if(i==4)h+='<span class="dash" style="animation-delay:'+i*.07+'s">-</span>';h+='<span class="ch" style="animation-delay:'+i*.07+'s">'+esc(c)+'</span>'});
+ h+='</div><button class="copy" id="cp">Copy code</button><div class="bar"><b id="pb"></b></div><div class="muted" id="left"></div>'+
+ '<ol><li>Open <b>WhatsApp</b> on the phone with that number</li><li>Tap <b>Linked devices</b> then <b>Link a device</b></li><li>Choose <b>Link with phone number instead</b></li><li>Enter the code above. Keep this page open.</li></ol>';
+ r.innerHTML=h;
+ $('cp').onclick=async()=>{try{await navigator.clipboard.writeText(code)}catch{const t=document.createElement('textarea');t.value=code;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
+  $('cp').textContent='Copied';$('cp').classList.add('done');toast('Code copied');setTimeout(()=>{$('cp').textContent='Copy code';$('cp').classList.remove('done')},1600)};
+ let s=120;const tick=()=>{$('pb').style.width=(s/120*100)+'%';$('left').textContent=s>0?('Expires in '+s+'s'):'Code expired - generate a new one';s--;if(s<-1)clearInterval(timer)};tick();timer=setInterval(tick,1000);
+}
+$('go').onclick=async()=>{
+ const b=$('go'),r=$('res');b.disabled=true;b.innerHTML='<span class="spin"></span>Generating...';r.style.display='none';
+ try{const x=await fetch('/api/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot,phone:$('phone').value})});
+  const d=await x.json();if(!x.ok)throw new Error(d.error||'Pairing failed');showCode(d.code);refresh();
+ }catch(e){r.style.display='block';r.innerHTML='<div class="err">'+esc(e.message)+'</div>'}
+ finally{b.disabled=false;b.textContent='Generate pairing code'}};
+async function refresh(){try{const d=await (await fetch('/api/sessions')).json();if(!d.success)return;
+ $('slots').innerHTML=d.sessions.map(s=>{const st=s.connection==='open'?'open':(s.pairingCode?'pairing':'');
+  const label=s.connection==='open'?'Connected':s.pairingCode?'Waiting for code':s.connection==='idle'?'Empty':s.connection;
+  if(s.connection==='open'&&!lastOpen[s.slot]&&!first){confetti();toast('Slot '+s.slot+' linked');clearInterval(timer);$('res').style.display='none'}
+  lastOpen[s.slot]=s.connection==='open';
+  return '<div class="slot"><div><b>Slot '+esc(s.slot)+'</b>'+(s.botId?'<div class="muted">'+esc(String(s.botId).split(':')[0].split('@')[0])+'</div>':'')+'</div><span class="pill '+st+'">'+esc(label)+'</span></div>'}).join('');first=false}catch{}}
 refresh();setInterval(refresh,3000);
-</script></body></html>
+</script>
+</body></html>
