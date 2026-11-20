@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Tic Tac Toe</title><style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0b1020;color:#eaf0ff;font-family:system-ui,sans-serif;touch-action:manipulation}h1{font-size:20px;margin:8px}button{background:#4f7cff;color:#fff;border:0;border-radius:10px;padding:10px 18px;font-size:16px;margin:6px}#s{margin:6px;opacity:.85}#b{display:grid;grid-template-columns:repeat(3,96px);gap:8px}#b div{height:96px;background:#111a33;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:700;cursor:pointer}</style></head><body>
+<h1>Tic Tac Toe (you are X)</h1><div id="s">Your move</div><div id="b"></div><button id="r">Restart</button>
+<script>
+const W=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];let B,done;
+const win=(b,p)=>W.some(l=>l.every(i=>b[i]==p)),full=b=>b.every(Boolean);
+function mm(b,p){if(win(b,'O'))return 1;if(win(b,'X'))return -1;if(full(b))return 0;
+let best=p=='O'?-2:2;for(let i=0;i<9;i++)if(!b[i]){b[i]=p;const v=mm(b,p=='O'?'X':'O');b[i]='';best=p=='O'?Math.max(best,v):Math.min(best,v)}return best}
+function ai(){let bi=-1,bv=-2;for(let i=0;i<9;i++)if(!B[i]){B[i]='O';const v=mm(B,'X');B[i]='';if(v>bv){bv=v;bi=i}}if(bi>=0)B[bi]='O'}
+function draw(){const g=document.getElementById('b');g.innerHTML='';B.forEach((v,i)=>{const d=document.createElement('div');d.textContent=v;d.onclick=()=>play(i);g.appendChild(d)});
+document.getElementById('s').textContent=win(B,'X')?'You win!':win(B,'O')?'Bot wins':full(B)?'Draw':'Your move'}
+function play(i){if(done||B[i])return;B[i]='X';if(!win(B,'X')&&!full(B))ai();done=win(B,'X')||win(B,'O')||full(B);draw()}
+function init(){B=Array(9).fill('');done=false;draw()}document.getElementById('r').onclick=init;init();
+</script></body></html>

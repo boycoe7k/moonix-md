@@ -1,0 +1,11 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Memory Match</title><style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0b1020;color:#eaf0ff;font-family:system-ui,sans-serif;touch-action:manipulation}h1{font-size:20px;margin:8px}button{background:#4f7cff;color:#fff;border:0;border-radius:10px;padding:10px 18px;font-size:16px;margin:6px}#s{margin:6px;opacity:.85}#b{display:grid;grid-template-columns:repeat(4,70px);gap:8px}#b div{height:70px;background:#4f7cff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:34px;cursor:pointer}#b div.o{background:#111a33}#b div.m{background:#1d6b4a}</style></head><body>
+<h1>Memory Match</h1><div id="s">Moves: 0</div><div id="b"></div><button id="r">Restart</button>
+<script>
+const E=['🍎','🚀','🐱','⚽','🎧','🌵','🍕','💎'];let C,o,mv,lock,mt;
+function init(){C=[...E,...E].sort(()=>Math.random()-.5);o=[];mv=0;mt=0;lock=false;const g=document.getElementById('b');g.innerHTML='';
+C.forEach((e,i)=>{const d=document.createElement('div');d.onclick=()=>flip(i,d);g.appendChild(d)});s()}
+function s(){document.getElementById('s').textContent=mt==8?'Done in '+mv+' moves!':'Moves: '+mv}
+function flip(i,d){if(lock||d.classList.contains('o')||d.classList.contains('m'))return;d.classList.add('o');d.textContent=C[i];o.push([i,d]);
+if(o.length==2){mv++;lock=true;const [a,b]=o;setTimeout(()=>{if(C[a[0]]==C[b[0]]){a[1].classList.add('m');b[1].classList.add('m');mt++}else{[a[1],b[1]].forEach(x=>{x.classList.remove('o');x.textContent=''})}o=[];lock=false;s()},600)}}
+document.getElementById('r').onclick=init;init();
+</script></body></html>

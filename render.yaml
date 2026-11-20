@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: nexora-bot-mini
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: OWNER_NUMBER
+        sync: false
+      - key: BOT_NAME
+        value: Moonix MD
+      - key: AUTHOR
+        value: Boycoe-dev
+      - key: PREFIX
+        value: .
+      - key: DASHBOARD_TOKEN
+        sync: false
+      - key: SESSION_ROOT
+        value: /tmp/nexora-sessions
+      - key: NEXA_VDL_API_KEY
+        sync: false
+      - key: UNSPLASH_KEY
+        sync: false
+      - key: IMGBB_API_KEY
+        sync: false
+      - key: REMOVEBG_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
