@@ -4,7 +4,8 @@ const {
     default: makeWASocket,
     useMultiFileAuthState,
     DisconnectReason,
-    fetchLatestWaWebVersion
+    fetchLatestWaWebVersion,
+    Browsers
 } = require("@whiskeysockets/baileys");
 
 const P = require("pino");
@@ -293,7 +294,8 @@ app.post("/api/pair", async (req, res) => {
         }
 
         const slot = getSlot(req.body?.slot);
-        const phone = String(req.body?.phone || "").replace(/\D/g, "");
+        let phone = String(req.body?.phone || "").replace(/\D/g, "");
+        phone = phone.replace(/^00/, "");
 
         if (!slot) {
             return res.status(400).json({ success: false, error: "Choose session 1, 2, or 3." });
@@ -339,7 +341,22 @@ app.post("/api/pair", async (req, res) => {
             throw new Error("Pairing codes are unavailable in this Baileys build.");
         }
 
+        // requestPairingCode only generates the code locally and fires the request
+        // without waiting, so a rejection by WhatsApp (bad number etc.) was silent.
+        // Listen for the error reply and report it instead of showing a dead code.
+        let waError = null;
+        const onErr = node => { waError = waError || node; };
+        sock.ws.on("CB:iq,type:error", onErr);
         const code = await sock.requestPairingCode(phone);
+        await new Promise(resolve => setTimeout(resolve, 2500));
+        sock.ws.off("CB:iq,type:error", onErr);
+        if (waError) {
+            const errNode = Array.isArray(waError.content) ? waError.content.find(c => c.tag === "error") : null;
+            const detail = errNode ? `${errNode.attrs?.code} ${errNode.attrs?.text}` : "unknown error";
+            console.error(chalk.red(`Session ${slot}: WhatsApp rejected the pairing request for ${phone}: ${detail}`));
+            throw new Error(`WhatsApp rejected this number (${detail}). Use the full international number with no +, spaces or leading 0 after the country code, and make sure it is registered on WhatsApp.`);
+        }
+        console.log(chalk.green(`Session ${slot}: pairing code issued for ${phone.slice(0, 4)}***`));
         state.pairingCode = code;
         state.pairingInProgress = false;
         setSessionStatus(state, { connection: "pairing", pairingCode: code });
@@ -427,7 +444,7 @@ async function createSocket(state, pairingRequested = false) {
         auth: authState,
         logger: P({ level: process.env.LOG_LEVEL || "silent" }),
         printQRInTerminal: false,
-        browser: ["Moonix MD", "Chrome", "1.0.0"],
+        browser: Browsers.ubuntu("Chrome"),
         ...(version ? { version } : {}),
         generateHighQualityLinkPreview: true,
         syncFullHistory: false,
@@ -440,6 +457,9 @@ async function createSocket(state, pairingRequested = false) {
     state.stopping = false;
 
     sock.ev.on("creds.update", saveCreds);
+    sock.ws.on("CB:notification,type:link_code_companion_reg", () => {
+        console.log(chalk.cyan(`Session ${slot}: phone entered the pairing code, finishing link...`));
+    });
 
     sock.ev.on("connection.update", async update => {
         // Events from a replaced/old socket must not touch the current one.
